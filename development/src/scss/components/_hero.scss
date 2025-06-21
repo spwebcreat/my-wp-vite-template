@@ -36,9 +36,9 @@
   
   // コンテンツコンテナ
   &__content {
-    @include container;
     position: relative;
     z-index: 1;
+    @include container;
   }
   
   // メインタイトル

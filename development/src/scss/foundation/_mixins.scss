@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use 'variables' as *;
 
 // レスポンシブミックスイン
@@ -78,11 +79,11 @@
   color: $color-white;
   
   &:hover {
-    background-color: darken($color-primary, 8%);
+    background-color: color.adjust($color-primary, $lightness: -8%);
   }
   
   &:active {
-    background-color: darken($color-primary, 12%);
+    background-color: color.adjust($color-primary, $lightness: -12%);
   }
 }
 
