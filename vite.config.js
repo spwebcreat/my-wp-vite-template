@@ -359,7 +359,14 @@ export default defineConfig({
     watch: {
       usePolling: true,
       interval: 100,
-      ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**']
+      ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**'],
+      // EventEmitter memory leak警告を軽減
+      chokidar: {
+        awaitWriteFinish: {
+          stabilityThreshold: 100,
+          pollInterval: 100
+        }
+      }
     },
     // CSSホットリロード最適化
     css: {
