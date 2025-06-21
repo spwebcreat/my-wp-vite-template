@@ -1,0 +1,102 @@
+@use '../foundation/variables' as *;
+@use '../foundation/mixins' as *;
+
+// ヘッダーレイアウト
+
+.l-header {
+  background-color: $color-white;
+  box-shadow: $shadow-sm;
+  position: sticky;
+  top: 0;
+  z-index: $z-index-sticky;
+  
+  &__container {
+    @include container;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: $spacing-sm;
+    padding-bottom: $spacing-sm;
+    
+    @include media(lg) {
+      padding-top: $spacing-md;
+      padding-bottom: $spacing-md;
+    }
+  }
+  
+  // ロゴエリア
+  &__logo {
+    display: flex;
+    align-items: center;
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-gray-900;
+    text-decoration: none;
+    
+    @include media(lg) {
+      font-size: $font-size-2xl;
+    }
+    
+    &:hover {
+      color: $color-primary;
+    }
+    
+    img {
+      height: 40px;
+      width: auto;
+      margin-right: $spacing-sm;
+    }
+  }
+  
+  // ナビゲーションエリア
+  &__nav {
+    display: none;
+    
+    @include media(lg) {
+      display: block;
+    }
+  }
+  
+  // モバイルメニューボタン
+  &__mobile-toggle {
+    display: block;
+    background: none;
+    border: none;
+    font-size: $font-size-xl;
+    color: $color-gray-700;
+    cursor: pointer;
+    padding: $spacing-xs;
+    
+    @include media(lg) {
+      display: none;
+    }
+    
+    &:hover {
+      color: $color-primary;
+    }
+  }
+  
+  // バリエーション: 透明ヘッダー
+  &--transparent {
+    background-color: transparent;
+    box-shadow: none;
+    position: absolute;
+    width: 100%;
+    
+    .l-header__logo {
+      color: $color-white;
+    }
+    
+    .l-header__mobile-toggle {
+      color: $color-white;
+    }
+  }
+  
+  // バリエーション: 固定ヘッダー
+  &--fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+}

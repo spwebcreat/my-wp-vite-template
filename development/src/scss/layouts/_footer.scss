@@ -1,0 +1,196 @@
+@use '../foundation/variables' as *;
+@use '../foundation/mixins' as *;
+
+// フッターレイアウト
+
+.l-footer {
+  background-color: $color-gray-900;
+  color: $color-gray-300;
+  padding: $spacing-3xl 0 $spacing-lg;
+  
+  &__container {
+    @include container;
+  }
+  
+  // メインフッターエリア
+  &__main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+    margin-bottom: $spacing-xl;
+    
+    @include media(md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @include media(lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  
+  // フッターカラム
+  &__column {
+    h3 {
+      color: $color-white;
+      font-size: $font-size-lg;
+      font-weight: 600;
+      margin-bottom: $spacing-md;
+    }
+    
+    p {
+      line-height: $line-height-relaxed;
+      margin-bottom: $spacing-sm;
+    }
+    
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      
+      li {
+        margin-bottom: $spacing-xs;
+      }
+    }
+    
+    a {
+      color: $color-gray-300;
+      text-decoration: none;
+      transition: color 0.2s ease-in-out;
+      
+      &:hover {
+        color: $color-white;
+      }
+    }
+  }
+  
+  // 会社情報カラム
+  &__company {
+    .l-footer__logo {
+      color: $color-white;
+      font-size: $font-size-xl;
+      font-weight: 700;
+      margin-bottom: $spacing-md;
+      text-decoration: none;
+      
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+  
+  // ソーシャルメディアリンク
+  &__social {
+    display: flex;
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+    
+    a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background-color: $color-gray-800;
+      color: $color-gray-300;
+      border-radius: $border-radius-full;
+      text-decoration: none;
+      transition: all 0.2s ease-in-out;
+      
+      &:hover {
+        background-color: $color-primary;
+        color: $color-white;
+        transform: translateY(-2px);
+      }
+    }
+  }
+  
+  // コピーライトエリア
+  &__bottom {
+    padding-top: $spacing-lg;
+    border-top: 1px solid $color-gray-800;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: $spacing-sm;
+    
+    @include media(md) {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+    }
+  }
+  
+  &__copyright {
+    font-size: $font-size-sm;
+    color: $color-gray-400;
+  }
+  
+  // 下部リンク
+  &__bottom-links {
+    display: flex;
+    gap: $spacing-md;
+    font-size: $font-size-sm;
+    
+    a {
+      color: $color-gray-400;
+      text-decoration: none;
+      
+      &:hover {
+        color: $color-white;
+      }
+    }
+  }
+  
+  // バリエーション: シンプルフッター
+  &--simple {
+    padding: $spacing-lg 0;
+    
+    .l-footer__main {
+      display: none;
+    }
+    
+    .l-footer__bottom {
+      border-top: none;
+      padding-top: 0;
+    }
+  }
+  
+  // バリエーション: ライトフッター
+  &--light {
+    background-color: $color-gray-100;
+    color: $color-gray-700;
+    
+    .l-footer__column {
+      h3 {
+        color: $color-gray-900;
+      }
+      
+      a {
+        color: $color-gray-600;
+        
+        &:hover {
+          color: $color-primary;
+        }
+      }
+    }
+    
+    .l-footer__bottom {
+      border-top-color: $color-gray-200;
+    }
+    
+    .l-footer__copyright {
+      color: $color-gray-500;
+    }
+    
+    .l-footer__social a {
+      background-color: $color-white;
+      color: $color-gray-600;
+      
+      &:hover {
+        background-color: $color-primary;
+        color: $color-white;
+      }
+    }
+  }
+}

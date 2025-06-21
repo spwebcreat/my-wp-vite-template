@@ -1,0 +1,157 @@
+@use '../foundation/variables' as *;
+@use '../foundation/mixins' as *;
+
+// ヒーローセクションコンポーネント
+
+.c-hero {
+  position: relative;
+  min-height: 80vh;
+  @include flex-center;
+  flex-direction: column;
+  text-align: center;
+  color: $color-white;
+  overflow: hidden;
+  
+  // 背景画像
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -2;
+  }
+  
+  // オーバーレイ
+  &__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(26, 115, 232, 0.8), rgba(52, 168, 83, 0.8));
+    z-index: -1;
+  }
+  
+  // コンテンツコンテナ
+  &__content {
+    @include container;
+    position: relative;
+    z-index: 1;
+  }
+  
+  // メインタイトル
+  &__title {
+    font-size: $font-size-3xl;
+    font-weight: 800;
+    line-height: $line-height-tight;
+    margin-bottom: $spacing-md;
+    
+    @include media(md) {
+      font-size: $font-size-5xl;
+    }
+    
+    @include media(lg) {
+      font-size: 4rem;
+    }
+  }
+  
+  // サブタイトル
+  &__subtitle {
+    font-size: $font-size-lg;
+    font-weight: 400;
+    line-height: $line-height-relaxed;
+    margin-bottom: $spacing-xl;
+    opacity: 0.9;
+    
+    @include media(md) {
+      font-size: $font-size-xl;
+    }
+  }
+  
+  // CTA（Call to Action）ボタンエリア
+  &__cta {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    align-items: center;
+    
+    @include media(sm) {
+      flex-direction: row;
+      justify-content: center;
+    }
+  }
+  
+  // バリエーション: コンパクトヒーロー
+  &--compact {
+    min-height: 50vh;
+    
+    .c-hero__title {
+      font-size: $font-size-2xl;
+      
+      @include media(md) {
+        font-size: $font-size-4xl;
+      }
+    }
+  }
+  
+  // バリエーション: テキストのみ（背景なし）
+  &--text-only {
+    background: linear-gradient(135deg, $color-primary, $color-secondary);
+    
+    .c-hero__background,
+    .c-hero__overlay {
+      display: none;
+    }
+  }
+  
+  // バリエーション: 左寄せ
+  &--left {
+    text-align: left;
+    
+    .c-hero__content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    
+    .c-hero__cta {
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+  }
+}
+
+// ヒーロー内のスクロールダウンインジケーター
+.c-hero__scroll {
+  position: absolute;
+  bottom: $spacing-lg;
+  left: 50%;
+  transform: translateX(-50%);
+  color: $color-white;
+  opacity: 0.8;
+  animation: bounce 2s infinite;
+  
+  &__text {
+    font-size: $font-size-sm;
+    margin-bottom: $spacing-xs;
+  }
+  
+  &__arrow {
+    font-size: $font-size-lg;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
