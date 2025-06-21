@@ -1,0 +1,29 @@
+{
+  "projectDescription": "WordPress development with Vite + TailwindCSS + SCSS",
+  "suggestedPermissions": {
+    "allow": [
+      "Bash(git rm:*)",
+      "Bash(touch:*)",
+      "Bash(grep:*)",
+      "Bash(rm:*)",
+      "Bash(npm install)",
+      "Bash(npm run convert-images:*)",
+      "Bash(make:*)",
+      "Bash(npm run build:*)",
+      "Bash(ls:*)",
+      "Bash(npm run dev:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(npm run copy-assets:*)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(pkill:*)"
+    ]
+  },
+  "recommendedMcpServers": [
+    "playwright"
+  ],
+  "customCommands": {
+    "plan-github-issue": "GitHub issueの実装計画を作成"
+  }
+} 
