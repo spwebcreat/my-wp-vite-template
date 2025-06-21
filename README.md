@@ -27,7 +27,23 @@
 
 ## 🚀 クイックスタート
 
-### Step 1: Local by WP Engineでサイト作成
+### 既存のWordPress環境への追加
+
+既存のWordPress環境に開発テンプレートを追加する場合（推奨）：
+
+```bash
+# WordPressプロジェクトのルートディレクトリに移動
+cd your-wordpress-project
+
+# テンプレートを現在のディレクトリに展開
+git clone --depth 1 https://github.com/spwebcreat/my-wp-vite-template.git temp-template
+rsync -av temp-template/ ./
+rm -rf temp-template
+```
+
+### 新規プロジェクトの場合
+
+#### Step 1: Local by WP Engineでサイト作成
 
 1. **Local by WP Engine**を起動
 2. **Create a new site**をクリック
@@ -37,27 +53,26 @@
    - **WordPress**: 最新版
 4. サイトを作成し、**Site shell**を開く
 
-### Step 2: テーマディレクトリでクローン
+#### Step 2: プロジェクトルートでテンプレート展開
 
 Local shellで以下を実行：
 
 ```bash
-# wp-contentディレクトリに移動
-cd app/public/wp-content
+# プロジェクトルートディレクトリに移動（app/publicの親ディレクトリ）
+cd /path/to/your-wordpress-project
 
-# themesディレクトリを削除（デフォルトテーマは不要）
-rm -rf themes
-
-# このテンプレートをクローン（themes全体として）
-git clone https://github.com/your-username/my-wp-vite-template.git themes
-
-# 作業ディレクトリに移動
-cd themes/development/themes/mythme
+# テンプレートを現在のディレクトリに展開
+git clone --depth 1 https://github.com/spwebcreat/my-wp-vite-template.git temp-template
+rsync -av temp-template/ ./
+rm -rf temp-template
 ```
 
 ### Step 3: 自動セットアップ
 
 ```bash
+# developmentディレクトリに移動
+cd development/themes/mythme
+
 # 初回セットアップ（全自動）
 make install
 
@@ -81,7 +96,7 @@ make dev
 ## 📁 ディレクトリ構造
 
 ```
-my-wp-vite-template/
+your-wordpress-project/
 ├── README.md                    # このファイル
 ├── Makefile                     # 開発タスク自動化
 ├── CLAUDE.md                    # Claude Code設定
@@ -102,14 +117,17 @@ my-wp-vite-template/
 │   ├── docs/                   # ドキュメント
 │   ├── scripts/                # セットアップスクリプト
 │   └── plugins/                # カスタムプラグイン開発
-└── app/                        # WordPressインストール（Local）
-    └── public/                 # WordPressルート
+├── app/                        # WordPressインストール（Local）
+│   └── public/                 # WordPressルート
+├── conf/                       # サーバー設定
+└── logs/                       # ログファイル
 ```
 
 ## 🛠️ 開発コマンド
 
 ### 基本コマンド
 ```bash
+# development/themes/mythme ディレクトリで実行
 make dev        # 開発サーバー起動
 make build      # 本番ビルド
 make setup      # 開発環境セットアップ
@@ -134,6 +152,7 @@ npm run test:ui            # テストUI表示
 
 ### 即時変換機能
 ```bash
+# development/themes/mythme ディレクトリで実行
 npm run dev
 ```
 
@@ -215,6 +234,15 @@ lsof -i :5173
 
 # 別ポートで起動
 npx vite --port 3000
+```
+
+**テンプレートの展開でエラー**
+```bash
+# rsyncが利用できない場合の手動展開
+git clone https://github.com/spwebcreat/my-wp-vite-template.git temp-template
+cp -r temp-template/* ./
+cp -r temp-template/.* ./ 2>/dev/null || true  # 隠しファイルもコピー
+rm -rf temp-template
 ```
 
 ## 📚 詳細ドキュメント
