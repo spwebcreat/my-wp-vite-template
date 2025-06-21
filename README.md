@@ -27,22 +27,6 @@
 
 ## 🚀 クイックスタート
 
-### 既存のWordPress環境への追加
-
-既存のWordPress環境に開発テンプレートを追加する場合（推奨）：
-
-```bash
-# WordPressプロジェクトのルートディレクトリに移動
-cd your-wordpress-project
-
-# テンプレートを現在のディレクトリに展開
-git clone --depth 1 https://github.com/spwebcreat/my-wp-vite-template.git temp-template
-rsync -av temp-template/ ./
-rm -rf temp-template
-```
-
-### 新規プロジェクトの場合
-
 #### Step 1: Local by WP Engineでサイト作成
 
 1. **Local by WP Engine**を起動
@@ -58,31 +42,29 @@ rm -rf temp-template
 Local shellで以下を実行：
 
 ```bash
-# プロジェクトルートディレクトリに移動（app/publicの親ディレクトリ）
-cd /path/to/your-wordpress-project
-
 # テンプレートを現在のディレクトリに展開
 git clone --depth 1 https://github.com/spwebcreat/my-wp-vite-template.git temp-template
 rsync -av temp-template/ ./
 rm -rf temp-template
 ```
 
-### Step 3: 自動セットアップ
+### Step 3: WordPressの初期設定（テーマ設定、プラグインインストール等）
 
 ```bash
-# developmentディレクトリに移動
-cd development/themes/mythme
-
-# 初回セットアップ（全自動）
-make install
-
-# WordPressの初期設定（プラグインインストール等）
-bash ../../scripts/setup-local.sh
+# ルートディレクトリで開発環境のセットアップを実行
+bash ../../development/scripts/setup-local.sh
 ```
 
 > 📖 **詳細なWordPress設定手順**: [LOCAL-SETUP.md](LOCAL-SETUP.md) を参照
 
-### Step 4: 開発開始
+### Step 4: 開発環境のセットアップ
+
+```bash
+# ルートディレクトリで開発環境のセットアップを実行
+make setup
+```
+
+### Step 5: 開発サーバー起動
 
 ```bash
 # 開発サーバー起動（画像監視付き）
@@ -193,7 +175,7 @@ fontFamily: {
 
 ## 📝 WP-CLI セットアップ内容
 
-`make setup-wp`で実行される設定：
+
 
 - 日本語インストール・有効化
 - タイムゾーン設定（Asia/Tokyo）

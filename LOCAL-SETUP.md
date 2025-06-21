@@ -16,14 +16,12 @@
 3. **「Open site shell」**をクリック
 4. ターミナルが開いたら以下を実行
 
+
+
 ### Step 2: 自動セットアップ実行
-
 ```bash
-# テーマディレクトリに移動
-cd app/public/wp-content/themes/mythme
-
-# 自動セットアップ実行
-bash ../../scripts/setup-local.sh
+# WordPressの初期設定（プラグインインストール等）
+bash ../../development/scripts/setup-local.sh
 ```
 
 ## 🛠️ 手動セットアップ（詳細制御）
