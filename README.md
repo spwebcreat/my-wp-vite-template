@@ -97,7 +97,7 @@ your-wordpress-project/
 │   ├── themes/
 │   │   └── mythme/             # メインテーマ
 │   │       ├── dist/           # ビルド出力
-│   │       │   └── assets/     # 同期されたアセット・CSS・JS・画像
+│   │       │   └── assets/     # 同期されたアセット
 │   │       │       └── images/ # 同期された画像
 │   │       │       └── js/     # 同期されたJavaScript
 │   │       │       └── css/    # 同期されたCSS
