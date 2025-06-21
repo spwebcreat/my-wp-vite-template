@@ -84,7 +84,7 @@ your-wordpress-project/
 ├── CLAUDE.md                    # Claude Code設定
 ├── development/                 # 開発リソース
 │   ├── themes/
-│   │   └── mythme/             # メインテーマ
+│   │   └── mythme/             # メインテーマ(シンボリックリンク)
 │   │       ├── src/            # 開発用ソース
 │   │       │   ├── js/         # JavaScript
 │   │       │   ├── scss/       # SCSS
@@ -98,11 +98,11 @@ your-wordpress-project/
 │   │       └── vite.config.js  # Vite設定
 │   ├── docs/                   # ドキュメント
 │   ├── scripts/                # セットアップスクリプト
-│   └── plugins/                # カスタムプラグイン開発
-├── app/                        # WordPressインストール（Local）
+│   └── plugins/                # カスタムプラグイン開発(シンボリックリンク)
+├── app/                        # WordPressインストール（Local by WP Engine）
 │   └── public/                 # WordPressルート
-├── conf/                       # サーバー設定
-└── logs/                       # ログファイル
+├── conf/                       # サーバー設定（Local by WP Engine）
+└── logs/                       # ログファイル（Local by WP Engine）
 ```
 
 ## 🛠️ 開発コマンド

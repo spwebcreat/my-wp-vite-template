@@ -73,3 +73,7 @@ development/themes/mythme/dist/images/
 # 開発用一時ファイル
 .temp/
 tmp/
+
+# docs
+development/docs/
+!development/docs/.gitkeep
