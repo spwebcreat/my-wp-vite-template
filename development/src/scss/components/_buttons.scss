@@ -1,0 +1,99 @@
+@use '../foundation/variables' as *;
+@use '../foundation/mixins' as *;
+
+// ボタンコンポーネント
+
+.c-btn {
+  @include button-base;
+  
+  // プライマリボタン
+  &--primary {
+    @include button-primary;
+  }
+  
+  // セカンダリボタン
+  &--secondary {
+    @include button-secondary;
+  }
+  
+  // アウトラインボタン
+  &--outline {
+    @include button-base;
+    background-color: transparent;
+    color: $color-gray-700;
+    border-color: $color-gray-300;
+    
+    &:hover {
+      background-color: $color-gray-50;
+      border-color: $color-gray-400;
+    }
+  }
+  
+  // ゴーストボタン
+  &--ghost {
+    @include button-base;
+    background-color: transparent;
+    color: $color-white;
+    border-color: $color-white;
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+  
+  // サイズバリエーション
+  &--sm {
+    padding: calc($spacing-xs / 2) $spacing-sm;
+    font-size: $font-size-sm;
+  }
+  
+  &--lg {
+    padding: $spacing-sm $spacing-xl;
+    font-size: $font-size-lg;
+  }
+  
+  &--xl {
+    padding: $spacing-md $spacing-2xl;
+    font-size: $font-size-xl;
+  }
+  
+  // 全幅ボタン
+  &--full {
+    width: 100%;
+  }
+  
+  // アイコン付きボタン
+  &__icon {
+    margin-right: $spacing-xs;
+    
+    &--right {
+      margin-right: 0;
+      margin-left: $spacing-xs;
+    }
+  }
+}
+
+// ボタングループ
+.c-btn-group {
+  display: inline-flex;
+  
+  .c-btn {
+    border-radius: 0;
+    border-right: 0;
+    
+    &:first-child {
+      border-top-left-radius: $border-radius-md;
+      border-bottom-left-radius: $border-radius-md;
+    }
+    
+    &:last-child {
+      border-top-right-radius: $border-radius-md;
+      border-bottom-right-radius: $border-radius-md;
+      border-right: 1px solid;
+    }
+    
+    &:hover {
+      z-index: 1;
+    }
+  }
+}

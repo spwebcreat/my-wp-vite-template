@@ -1,0 +1,148 @@
+@use 'variables' as *;
+
+// レスポンシブミックスイン
+@mixin media($breakpoint) {
+  @if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  } @else if $breakpoint == 2xl {
+    @media (min-width: $breakpoint-2xl) { @content; }
+  }
+}
+
+// コンテナミックスイン
+@mixin container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: $spacing-sm;
+  padding-right: $spacing-sm;
+  
+  @include media(sm) {
+    max-width: 640px;
+  }
+  
+  @include media(md) {
+    max-width: 768px;
+  }
+  
+  @include media(lg) {
+    max-width: 1024px;
+  }
+  
+  @include media(xl) {
+    max-width: 1280px;
+  }
+  
+  @include media(2xl) {
+    max-width: 1536px;
+  }
+}
+
+// ボタンベーススタイル
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xs $spacing-md;
+  font-size: $font-size-base;
+  font-weight: 500;
+  line-height: $line-height-tight;
+  border: 1px solid transparent;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  
+  &:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px $color-primary;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// プライマリボタン
+@mixin button-primary {
+  @include button-base;
+  background-color: $color-primary;
+  color: $color-white;
+  
+  &:hover {
+    background-color: darken($color-primary, 8%);
+  }
+  
+  &:active {
+    background-color: darken($color-primary, 12%);
+  }
+}
+
+// セカンダリボタン
+@mixin button-secondary {
+  @include button-base;
+  background-color: transparent;
+  color: $color-primary;
+  border-color: $color-primary;
+  
+  &:hover {
+    background-color: $color-primary;
+    color: $color-white;
+  }
+}
+
+// カードミックスイン
+@mixin card {
+  background-color: $color-white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-base;
+  padding: $spacing-lg;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+    transition: all 0.3s ease-in-out;
+  }
+}
+
+// フレックスセンター
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// グリッドレスポンシブ
+@mixin grid-responsive($min-width: 300px, $gap: $spacing-md) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: $gap;
+}
+
+// テキストトランケート
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ビジュアライザー非表示
+@mixin visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

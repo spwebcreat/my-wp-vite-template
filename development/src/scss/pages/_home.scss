@@ -1,0 +1,219 @@
+@use '../foundation/variables' as *;
+@use '../foundation/mixins' as *;
+
+// ホームページ固有のスタイル
+
+.p-home {
+  // セクション共通スタイル
+  &__section {
+    padding: $spacing-3xl 0;
+    
+    &:nth-child(even) {
+      background-color: $color-gray-50;
+    }
+  }
+  
+  // セクションタイトル
+  &__section-title {
+    text-align: center;
+    margin-bottom: $spacing-xl;
+    
+    h2 {
+      font-size: $font-size-3xl;
+      color: $color-gray-900;
+      margin-bottom: $spacing-md;
+      
+      @include media(md) {
+        font-size: $font-size-4xl;
+      }
+    }
+    
+    p {
+      font-size: $font-size-lg;
+      color: $color-gray-600;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+  }
+  
+  // サービスセクション
+  &__services {
+    .c-cards-grid {
+      margin-top: $spacing-xl;
+    }
+  }
+  
+  // ニュースセクション
+  &__news {
+    .p-home__news-list {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+  }
+  
+  &__news-item {
+    display: flex;
+    align-items: center;
+    padding: $spacing-md 0;
+    border-bottom: 1px solid $color-gray-200;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    &:hover {
+      background-color: $color-gray-50;
+      margin: 0 (-$spacing-md);
+      padding-left: $spacing-md;
+      padding-right: $spacing-md;
+      border-radius: $border-radius-md;
+    }
+  }
+  
+  &__news-date {
+    font-size: $font-size-sm;
+    color: $color-gray-500;
+    min-width: 100px;
+    margin-right: $spacing-md;
+  }
+  
+  &__news-category {
+    background-color: $color-primary;
+    color: $color-white;
+    font-size: $font-size-xs;
+    padding: 0.25rem 0.5rem;
+    border-radius: $border-radius-sm;
+    margin-right: $spacing-md;
+    white-space: nowrap;
+  }
+  
+  &__news-title {
+    flex: 1;
+    
+    a {
+      color: $color-gray-700;
+      text-decoration: none;
+      
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+  
+  // 会社概要セクション
+  &__about {
+    .p-home__about-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: $spacing-xl;
+      align-items: center;
+      
+      @include media(lg) {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .p-home__about-text {
+      h3 {
+        font-size: $font-size-2xl;
+        margin-bottom: $spacing-md;
+        color: $color-gray-900;
+      }
+      
+      p {
+        font-size: $font-size-lg;
+        line-height: $line-height-relaxed;
+        margin-bottom: $spacing-md;
+      }
+    }
+    
+    .p-home__about-image {
+      img {
+        width: 100%;
+        height: auto;
+        border-radius: $border-radius-lg;
+        box-shadow: $shadow-md;
+      }
+    }
+    
+    .p-home__about-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: $spacing-md;
+      margin-top: $spacing-xl;
+    }
+    
+    .p-home__stat {
+      text-align: center;
+      
+      .p-home__stat-number {
+        display: block;
+        font-size: $font-size-3xl;
+        font-weight: 700;
+        color: $color-primary;
+        margin-bottom: $spacing-xs;
+      }
+      
+      .p-home__stat-label {
+        font-size: $font-size-sm;
+        color: $color-gray-600;
+      }
+    }
+  }
+  
+  // お問い合わせセクション
+  &__contact {
+    background: linear-gradient(135deg, $color-primary, $color-secondary);
+    color: $color-white;
+    
+    .p-home__section-title {
+      h2, p {
+        color: $color-white;
+      }
+    }
+    
+    .p-home__contact-content {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+      
+      p {
+        font-size: $font-size-lg;
+        margin-bottom: $spacing-xl;
+        opacity: 0.9;
+      }
+    }
+    
+    .c-btn--ghost {
+      font-size: $font-size-lg;
+      padding: $spacing-md $spacing-2xl;
+    }
+  }
+  
+  // 特殊レイアウト: 数値実績セクション
+  &__achievements {
+    background-color: $color-primary;
+    color: $color-white;
+    
+    .p-home__achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: $spacing-xl;
+      text-align: center;
+    }
+    
+    .p-home__achievement {
+      .p-home__achievement-number {
+        font-size: $font-size-5xl;
+        font-weight: 800;
+        display: block;
+        margin-bottom: $spacing-sm;
+      }
+      
+      .p-home__achievement-label {
+        font-size: $font-size-lg;
+        opacity: 0.9;
+      }
+    }
+  }
+}
