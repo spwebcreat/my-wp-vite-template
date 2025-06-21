@@ -36,9 +36,13 @@
   
   // コンテンツコンテナ
   &__content {
-    @include container;
     position: relative;
     z-index: 1;
+    
+    // ミックスインを最後に配置してmixed-decls警告を回避
+    & {
+      @include container;
+    }
   }
   
   // メインタイトル

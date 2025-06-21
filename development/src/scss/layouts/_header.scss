@@ -11,12 +11,12 @@
   z-index: $z-index-sticky;
   
   &__container {
-    @include container;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding-top: $spacing-sm;
     padding-bottom: $spacing-sm;
+    @include container;
     
     @include media(lg) {
       padding-top: $spacing-md;
