@@ -97,17 +97,19 @@ your-wordpress-project/
 │   ├── themes/
 │   │   └── mythme/             # メインテーマ
 │   │       ├── dist/           # ビルド出力
-│   │       │   └── assets/     # 同期されたアセット
+│   │       │   └── assets/     # 同期されたアセット・CSS・JS・画像
+│   │       │       └── images/ # 同期された画像
+│   │       │       └── js/     # 同期されたJavaScript
+│   │       │       └── css/    # 同期されたCSS
 │   │       ├── functions.php   # WordPressテーマ設定
 │   │       ├── index.php       # メインテンプレート
-│   │       └── style.css       # テーマヘッダー
+│   │       └── style.css       # テーマスタイルシート
 │   ├── scripts/                # 自動化スクリプト
 │   │   ├── setup-local.sh      # WordPress初期設定
 │   │   ├── convert-images.js   # WebP変換
 │   │   ├── watch-images.js     # 画像監視
 │   │   └── copy-assets.js      # アセット同期
-│   ├── plugins/                # カスタムプラグイン開発
-│   └── docs/                   # ドキュメント
+│   └── plugins/                # カスタムプラグイン開発
 ├── app/                        # WordPressインストール（Local by WP Engine）
 │   └── public/                 # WordPressルート
 ├── conf/                       # サーバー設定（Local by WP Engine）
