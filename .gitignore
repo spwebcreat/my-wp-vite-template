@@ -74,6 +74,5 @@ development/themes/mythme/dist/images/
 .temp/
 tmp/
 
-# docs
-development/docs/
-!development/docs/.gitkeep
+# 
+*.code-workspace

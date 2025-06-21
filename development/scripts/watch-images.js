@@ -29,7 +29,7 @@ const defaultConfig = {
   inputDirs: [
     path.join(__dirname, '../src/images')
   ],
-  outputDir: path.join(__dirname, '../dist/images'),
+  outputDir: path.join(__dirname, '../themes/mythme/dist/assets/images'),
   supportedFormats: ['.jpg', '.jpeg', '.png'],
   webpOptions: {
     quality: 85,

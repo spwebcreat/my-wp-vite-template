@@ -25,8 +25,8 @@
 
 ### 🚀 クイックスタート（Local環境）
 ```bash
-# テーマディレクトリに移動
-cd /app/public/wp-content/themes/mythme
+# プロジェクトルートに移動
+cd [your-project-path]
 
 # 初回セットアップ（全自動）
 make install
@@ -134,7 +134,7 @@ npm run build:images
 ```
 
 ### 設定ファイル
-`scripts/convert-images.config.js`で詳細設定が可能：
+`../../../development/scripts/convert-images.config.js`で詳細設定が可能：
 ```javascript
 export default {
   // WebP変換品質

@@ -77,7 +77,6 @@ BASIC_PLUGINS=(
     "wp-multibyte-patch"
     "wp-pagenavi"
     "mw-wp-form"
-    "custom-post-type-ui"
     "intuitive-custom-post-order"
     "duplicate-post"
     "custom-post-type-permalinks"

@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npm run convert-images && npm run dev:watch",
     "dev:watch": "concurrently \"npm run watch-images\" \"vite\" --names \"📷,⚡\" --prefix-colors \"cyan,green\"",
-    "build": "npm run convert-images && vite build",
+    "build": "vite build && npm run convert-images",
     "preview": "vite preview",
     "wp-build": "wp-scripts build",
     "wp-start": "wp-scripts start",
@@ -15,9 +15,10 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:report": "playwright show-report",
-    "convert-images": "node scripts/convert-images.js",
-    "watch-images": "node scripts/watch-images.js",
-    "clean-images": "node scripts/clean-images.js",
+    "convert-images": "node development/scripts/convert-images.js",
+    "watch-images": "node development/scripts/watch-images.js",
+    "clean-images": "node development/scripts/clean-images.js",
+    "copy-assets": "node development/scripts/copy-assets.js",
     "build:images": "npm run convert-images && npm run build",
     "build:clean": "npm run clean-images && npm run convert-images && npm run build"
   },

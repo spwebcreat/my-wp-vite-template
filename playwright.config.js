@@ -6,7 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   // テストディレクトリ
-  testDir: './tests',
+  testDir: './development/themes/mythme/tests',
   
   // 並列実行の設定
   fullyParallel: true,

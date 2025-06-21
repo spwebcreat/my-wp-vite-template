@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #F6F6F6 !important;
+  color: #333 !important;
+  
+  // Vite開発環境での初期状態
+  &:not(.vite-ready) {
+    opacity: 0;
+  }
+  
+  // Vite準備完了後のトランジション
+  &.vite-ready {
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+  }
+}
+
+main {
+  min-height: 80vh;
+}
+
+// HMR時のスムーズな更新
+@layer base {
+  * {
+    @apply transition-none;
+  }
+  
+  // CSS更新時のみトランジションを有効化
+  .css-updating * {
+    @apply transition-all duration-100;
+  }
+}

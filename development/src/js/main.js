@@ -1,8 +1,14 @@
+// CSS HMR品質向上機能を最初にインポート（FOUC対策）
+import './css-hmr-enhancer.js';
+
+// SCSSのインポート
 import '../scss/main.scss';
 
 console.log('🎯 Vite is working! JavaScript loaded successfully');
 console.log('🎨 SCSS + TailwindCSS should be loaded too');
 console.log('🖼️  開発環境でもWebP変換が有効です（本番と同じ体験）');
+console.log('🎨 CSS HMR品質向上機能が有効です');
+
 
 // フロントエンド画像ハンドリングモジュールの使用例
 import { loadImage, createLazyImage, renderImageGallery } from './modules/image-handler.js';
@@ -44,4 +50,3 @@ document.addEventListener('DOMContentLoaded', () => {
   
   console.log('✅ 画像ハンドリング初期化完了');
 });
-

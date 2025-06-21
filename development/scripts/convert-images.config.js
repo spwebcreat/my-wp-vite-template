@@ -21,7 +21,7 @@ export default {
   ],
   
   // 出力ディレクトリ（ディレクトリ構成と画像名を保持）
-  outputDir: 'dist/images',
+  outputDir: 'themes/mythme/dist/assets/images',
   
   // 対応する画像形式
   supportedFormats: ['.jpg', '.jpeg', '.png'],

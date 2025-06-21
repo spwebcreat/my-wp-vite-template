@@ -14,6 +14,7 @@
 - **🎨 TailwindCSS**: ユーティリティファーストのCSS
 - **💅 SCSS**: パワフルなCSS拡張
 - **🖼️ WebP自動変換**: 画像最適化システム
+- **📁 アセット自動同期**: Gulpライクなファイル監視・同期
 - **🧪 Playwright**: E2Eテスト環境
 - **📦 Makefile**: 開発タスクの自動化
 - **🔧 Local by WP Engine**: 推奨ローカル環境
@@ -81,24 +82,32 @@ make dev
 your-wordpress-project/
 ├── README.md                    # このファイル
 ├── Makefile                     # 開発タスク自動化
-├── CLAUDE.md                    # Claude Code設定
+├── package.json                 # プロジェクトルートのnpm設定
+├── vite.config.js              # Vite設定（アセット同期機能付き）
 ├── development/                 # 開発リソース
+│   ├── src/                    # 開発用ソース（監視対象）
+│   │   ├── js/                 # JavaScript
+│   │   ├── scss/               # SCSS
+│   │   ├── images/             # 画像（WebP変換元）
+│   │   └── assets/             # 静的アセット
+│   │       ├── fonts/          # フォントファイル
+│   │       ├── icons/          # アイコンファイル
+│   │       ├── videos/         # 動画ファイル
+│   │       └── downloads/      # ダウンロード用ファイル
 │   ├── themes/
-│   │   └── mythme/             # メインテーマ(シンボリックリンク)
-│   │       ├── src/            # 開発用ソース
-│   │       │   ├── js/         # JavaScript
-│   │       │   ├── scss/       # SCSS
-│   │       │   └── images/     # 画像（WebP変換元）
+│   │   └── mythme/             # メインテーマ
 │   │       ├── dist/           # ビルド出力
-│   │       ├── scripts/        # 画像変換スクリプト
+│   │       │   └── assets/     # 同期されたアセット
 │   │       ├── functions.php   # WordPressテーマ設定
 │   │       ├── index.php       # メインテンプレート
-│   │       ├── style.css       # テーマヘッダー
-│   │       ├── package.json    # npm設定
-│   │       └── vite.config.js  # Vite設定
-│   ├── docs/                   # ドキュメント
-│   ├── scripts/                # セットアップスクリプト
-│   └── plugins/                # カスタムプラグイン開発(シンボリックリンク)
+│   │       └── style.css       # テーマヘッダー
+│   ├── scripts/                # 自動化スクリプト
+│   │   ├── setup-local.sh      # WordPress初期設定
+│   │   ├── convert-images.js   # WebP変換
+│   │   ├── watch-images.js     # 画像監視
+│   │   └── copy-assets.js      # アセット同期
+│   ├── plugins/                # カスタムプラグイン開発
+│   └── docs/                   # ドキュメント
 ├── app/                        # WordPressインストール（Local by WP Engine）
 │   └── public/                 # WordPressルート
 ├── conf/                       # サーバー設定（Local by WP Engine）
@@ -109,17 +118,26 @@ your-wordpress-project/
 
 ### 基本コマンド
 ```bash
-# development/themes/mythme ディレクトリで実行
-make dev        # 開発サーバー起動
+# プロジェクトルートで実行
+make dev        # 開発サーバー起動（アセット監視付き）
 make build      # 本番ビルド
 make setup      # 開発環境セットアップ
 make status     # プロジェクト状態確認
 ```
 
+### アセット管理
+```bash
+npm run copy-assets        # アセットを手動同期
+npm run dev                # 開発サーバー（自動同期付き）
+
+# HTTPエンドポイント経由での同期
+curl -X POST http://localhost:5173/__sync-assets
+```
+
 ### 画像変換
 ```bash
-npm run dev                # 開発サーバー（画像監視付き）
 npm run convert-images     # 全画像一括変換
+npm run watch-images       # 画像監視モード
 npm run clean-images       # 不要WebP削除
 ```
 
@@ -128,6 +146,40 @@ npm run clean-images       # 不要WebP削除
 npm test                   # Playwrightテスト実行
 npm run test:headed        # UIありテスト
 npm run test:ui            # テストUI表示
+```
+
+## 📁 アセット自動同期システム
+
+### Gulpライクな自動同期機能
+
+開発サーバー起動時に、`development/src/assets/`のファイルが自動的に`development/themes/mythme/dist/assets/`に同期されます：
+
+```bash
+# 開発サーバー起動
+npm run dev
+```
+
+**自動同期の特徴：**
+- ✅ **ファイル追加**: 即座にdistへコピー
+- ✅ **ファイル変更**: 自動的に更新を検出して同期
+- ✅ **ファイル削除**: distからも自動削除
+- ✅ **ディレクトリ構造**: 完全に保持
+
+**監視対象ディレクトリ：**
+- `development/src/assets/fonts/` → フォントファイル
+- `development/src/assets/icons/` → アイコン・SVG
+- `development/src/assets/videos/` → 動画ファイル
+- `development/src/assets/downloads/` → PDFなどのダウンロード用ファイル
+
+### 手動同期
+
+必要に応じて手動で同期することも可能：
+
+```bash
+# コマンドラインから
+npm run copy-assets
+
+# VSCodeのタスクランナーに登録して使用も可
 ```
 
 ## 🖼️ WebP画像変換システム
@@ -144,7 +196,7 @@ npm run dev
 - ✅ `src/images/photo.jpg` **変更** → 即座に `dist/images/photo.webp` 更新
 
 ### 設定
-`scripts/convert-images.config.js`で品質等を調整可能：
+`../../../development/scripts/convert-images.config.js`で品質等を調整可能：
 ```javascript
 export default {
   quality: 85,              // WebP品質
@@ -174,8 +226,6 @@ fontFamily: {
 ```
 
 ## 📝 WP-CLI セットアップ内容
-
-
 
 - 日本語インストール・有効化
 - タイムゾーン設定（Asia/Tokyo）
@@ -225,6 +275,23 @@ git clone https://github.com/spwebcreat/my-wp-vite-template.git temp-template
 cp -r temp-template/* ./
 cp -r temp-template/.* ./ 2>/dev/null || true  # 隠しファイルもコピー
 rm -rf temp-template
+```
+
+**アセットが同期されない**
+```bash
+# 手動で同期を実行
+npm run copy-assets
+
+# 開発サーバーを再起動
+make dev
+```
+
+**ファイル削除が反映されない**
+```bash
+# HTTPエンドポイント経由で同期
+curl -X POST http://localhost:5173/__sync-assets
+
+# または開発サーバーを再起動
 ```
 
 ## 📚 詳細ドキュメント

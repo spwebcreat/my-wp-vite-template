@@ -8,20 +8,83 @@
  */
 
 /**
- * Viteの開発サーバーとの連携
+ * Viteアセットの読み込み（開発・本番環境対応）
  */
 function my_wp_vite_enqueue_assets() {
-    // 開発環境では直接Viteのアセットを読み込む
-    wp_enqueue_script('vite-client', 'http://localhost:5173/@vite/client', [], '1.0', false);
-    wp_enqueue_script('vite-main', 'http://localhost:5173/src/js/main.js', [], '1.0', true);
+    $is_development = defined('WP_DEBUG') && WP_DEBUG;
     
-    // Vite用のmodule scriptタグを追加
-    add_filter('script_loader_tag', function($tag, $handle) {
-        if ($handle === 'vite-client' || $handle === 'vite-main') {
-            return str_replace('<script', '<script type="module"', $tag);
+    // 開発環境の場合、Viteサーバーの生存確認
+    $vite_server_running = false;
+    if ($is_development) {
+        $context = stream_context_create(['http' => ['timeout' => 1]]);
+        $vite_check = @file_get_contents('http://localhost:5173/@vite/client', false, $context);
+        $vite_server_running = $vite_check !== false;
+    }
+    
+    if ($is_development && $vite_server_running) {
+        // 開発環境: Viteサーバーから直接読み込み
+        wp_enqueue_script('vite-client', 'http://localhost:5173/@vite/client', [], '1.0', false);
+        wp_enqueue_script('vite-main', 'http://localhost:5173/development/src/js/main.js', [], '1.0', true);
+        
+        // 開発環境でのFOUC（Flash of Unstyled Content）対策
+        // 初期CSSを即座に適用するためのインラインスタイル
+        add_action('wp_head', function() {
+            ?>
+            <style id="vite-dev-css">
+                /* 開発環境での初期スタイル - FOUC防止 */
+                body { opacity: 0; transition: opacity 0.3s ease-in-out; }
+                body.vite-ready { opacity: 1; }
+            </style>
+            <script>
+                // Viteの準備が完了したらbodyを表示
+                if (typeof window !== 'undefined') {
+                    let viteReadyTimeout = setTimeout(() => {
+                        document.body.classList.add('vite-ready');
+                    }, 100);
+                    
+                    // Viteのモジュールが読み込まれたら即座に表示
+                    if (import.meta && import.meta.hot) {
+                        import.meta.hot.on('vite:connect', () => {
+                            clearTimeout(viteReadyTimeout);
+                            document.body.classList.add('vite-ready');
+                        });
+                    }
+                }
+            </script>
+            <?php
+        }, 5);
+        
+        // Vite用のmodule scriptタグを追加
+        add_filter('script_loader_tag', function($tag, $handle) {
+            if ($handle === 'vite-client' || $handle === 'vite-main') {
+                return str_replace('<script', '<script type="module"', $tag);
+            }
+            return $tag;
+        }, 10, 2);
+    } else {
+        // 本番環境: ビルド済みアセットを読み込み
+        $manifest_path = get_template_directory() . '/dist/.vite/manifest.json';
+        
+        if (file_exists($manifest_path)) {
+            $manifest = json_decode(file_get_contents($manifest_path), true);
+            
+            if (isset($manifest['development/src/js/main.js'])) {
+                $main_js = $manifest['development/src/js/main.js']['file'];
+                $main_css = $manifest['development/src/js/main.js']['css'][0] ?? null;
+                
+                // CSSを読み込み
+                if ($main_css) {
+                    wp_enqueue_style('main-css', get_template_directory_uri() . '/dist/' . $main_css, [], '1.0');
+                }
+                
+                // JSを読み込み
+                wp_enqueue_script('main-js', get_template_directory_uri() . '/dist/' . $main_js, [], '1.0', true);
+            }
+        } else {
+            // フォールバック: ビルド済みアセットがない場合
+            wp_enqueue_style('fallback-css', get_template_directory_uri() . '/style.css', [], '1.0');
         }
-        return $tag;
-    }, 10, 2);
+    }
 }
 add_action('wp_enqueue_scripts', 'my_wp_vite_enqueue_assets');
 

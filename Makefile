@@ -52,20 +52,20 @@ help:
 .PHONY: dev
 dev:
 	@echo "🔥 開発サーバーを起動中..."
-	@cd $(THEME_DIR) && npm run dev
+	npm run dev
 
 # 本番ビルド
 .PHONY: build
 build:
 	@echo "📦 本番用ビルドを作成中..."
-	@cd $(THEME_DIR) && npm run build
+	npm run build
 	@echo "✅ ビルド完了！"
 
 # クリーンアップ
 .PHONY: clean
 clean:
 	@echo "🧹 ビルドファイルをクリーンアップ中..."
-	@cd $(THEME_DIR) && rm -rf dist/*
+	rm -rf development/themes/mythme/dist/*
 	@echo "✅ クリーンアップ完了！"
 
 # 開発環境セットアップ
@@ -83,7 +83,7 @@ setup:
 .PHONY: install
 install:
 	@echo "📦 npm依存関係をインストール中..."
-	@cd $(THEME_DIR) && npm install
+	npm install
 	@echo "✅ インストール完了！"
 
 # シンボリックリンク作成

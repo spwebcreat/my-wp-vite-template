@@ -1,11 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './*.php',
-    './template-parts/**/*.php',
-    './inc/**/*.php',
-    './templates/**/*.php',
-    './src/**/*.js',
+    './development/themes/mythme/*.php',
+    './development/themes/mythme/template-parts/**/*.php',
+    './development/themes/mythme/inc/**/*.php',
+    './development/themes/mythme/templates/**/*.php',
+    './development/src/**/*.js',
   ],
   theme: {
     extend: {
