@@ -3,6 +3,11 @@
 /**
  * assets同期用スタンドアロンスクリプト
  * Viteプラグインとは別に、確実にassetsを同期するためのスクリプト
+ * 
+ * src/assets配下のすべてのディレクトリを動的に検出して同期します
+ * - 新規ディレクトリの自動検出
+ * - 削除されたディレクトリの自動削除
+ * - ファイルの追加/更新/削除の同期
  */
 
 import fs from 'fs';
@@ -57,9 +62,43 @@ function copyFile(src, dest) {
 function syncAssets() {
   console.log('🔄 Starting assets synchronization...');
   
-  const assetDirs = ['fonts', 'icons', 'videos', 'downloads'];
+  // src/assets配下のすべてのディレクトリを動的に取得
+  const getAssetDirs = () => {
+    if (!fs.existsSync(srcAssetsDir)) return [];
+    
+    return fs.readdirSync(srcAssetsDir)
+      .filter(item => {
+        const itemPath = path.join(srcAssetsDir, item);
+        return fs.statSync(itemPath).isDirectory();
+      });
+  };
   
-  assetDirs.forEach(dir => {
+  // dist/assets配下のディレクトリも取得（srcに存在しないものを検出）
+  const getDistDirs = () => {
+    if (!fs.existsSync(distAssetsDir)) return [];
+    
+    return fs.readdirSync(distAssetsDir)
+      .filter(item => {
+        const itemPath = path.join(distAssetsDir, item);
+        return fs.statSync(itemPath).isDirectory();
+      });
+  };
+  
+  const srcDirs = getAssetDirs();
+  const distDirs = getDistDirs();
+  
+  // distにのみ存在するディレクトリを削除
+  distDirs.forEach(dir => {
+    if (!srcDirs.includes(dir)) {
+      const distDir = path.join(distAssetsDir, dir);
+      // ディレクトリを再帰的に削除
+      fs.rmSync(distDir, { recursive: true, force: true });
+      console.log(`🗑️  Removed directory: ${dir}/`);
+    }
+  });
+  
+  // 各ディレクトリの差分を計算して同期
+  srcDirs.forEach(dir => {
     const srcDir = path.join(srcAssetsDir, dir);
     const distDir = path.join(distAssetsDir, dir);
     

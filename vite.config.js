@@ -64,23 +64,62 @@ const copyAssetsPlugin = () => {
   };
   
   const copyAssets = () => {
-    // fonts, icons, videos, downloadsをコピー
-    ['fonts', 'icons', 'videos', 'downloads'].forEach(dir => {
-      copyRecursive(
-        path.join(srcAssetsDir, dir),
-        path.join(distAssetsDir, dir)
-      );
-    });
+    // src/assets配下のすべてのディレクトリを動的に取得してコピー
+    if (fs.existsSync(srcAssetsDir)) {
+      fs.readdirSync(srcAssetsDir).forEach(item => {
+        const itemPath = path.join(srcAssetsDir, item);
+        if (fs.statSync(itemPath).isDirectory()) {
+          copyRecursive(
+            itemPath,
+            path.join(distAssetsDir, item)
+          );
+        }
+      });
+    }
     console.log('📁 Assets copied to dist/assets/');
   };
 
   // Gulpライクな差分同期
   const syncAssets = () => {
     console.log('🔄 Syncing assets...');
-    const assetDirs = ['fonts', 'icons', 'videos', 'downloads'];
+    
+    // src/assets配下のすべてのディレクトリを動的に取得
+    const getAssetDirs = () => {
+      if (!fs.existsSync(srcAssetsDir)) return [];
+      
+      return fs.readdirSync(srcAssetsDir)
+        .filter(item => {
+          const itemPath = path.join(srcAssetsDir, item);
+          return fs.statSync(itemPath).isDirectory();
+        });
+    };
+    
+    // dist/assets配下のディレクトリも取得（srcに存在しないものを検出）
+    const getDistDirs = () => {
+      if (!fs.existsSync(distAssetsDir)) return [];
+      
+      return fs.readdirSync(distAssetsDir)
+        .filter(item => {
+          const itemPath = path.join(distAssetsDir, item);
+          return fs.statSync(itemPath).isDirectory();
+        });
+    };
+    
+    const srcDirs = getAssetDirs();
+    const distDirs = getDistDirs();
+    
+    // distにのみ存在するディレクトリを削除
+    distDirs.forEach(dir => {
+      if (!srcDirs.includes(dir)) {
+        const distDir = path.join(distAssetsDir, dir);
+        // ディレクトリを再帰的に削除
+        fs.rmSync(distDir, { recursive: true, force: true });
+        console.log(`🗑️  Removed directory: ${dir}/`);
+      }
+    });
     
     // 各ディレクトリの差分を計算して同期
-    assetDirs.forEach(dir => {
+    srcDirs.forEach(dir => {
       const srcDir = path.join(srcAssetsDir, dir);
       const distDir = path.join(distAssetsDir, dir);
       
@@ -150,59 +189,146 @@ const copyAssetsPlugin = () => {
       console.log('💡 Gulpライクな自動同期を設定中...');
       
       // Node.js標準のfs.watchFileを使用（より安定）
-      const watchedDirs = ['fonts', 'icons', 'videos', 'downloads'];
+      const getWatchedDirs = () => {
+        if (!fs.existsSync(srcAssetsDir)) return [];
+        return fs.readdirSync(srcAssetsDir)
+          .filter(item => {
+            const itemPath = path.join(srcAssetsDir, item);
+            return fs.statSync(itemPath).isDirectory();
+          });
+      };
+      
       const watchers = new Map();
+      const dirWatchers = new Map(); // ディレクトリ監視用
       
       // ディレクトリ内のすべてのファイルを監視
-      const setupWatchers = () => {
+      const setupWatchers = (isUpdate = false) => {
+        // 更新時のみ、新規ファイルを追加で監視
+        if (!isUpdate) {
+          // 初回は全クリア
+          watchers.forEach((_, file) => {
+            fs.unwatchFile(file);
+          });
+          watchers.clear();
+          
+          dirWatchers.forEach((_, dir) => {
+            fs.unwatchFile(dir);
+          });
+          dirWatchers.clear();
+        }
+        
+        // src/assets自体を監視（新規ディレクトリの追加/削除を検出）
+        if (!dirWatchers.has(srcAssetsDir)) {
+          try {
+            const watcher = fs.watch(srcAssetsDir, { recursive: false }, (eventType, filename) => {
+              console.log(`📁 Assets root ${eventType}: ${filename || ''}`);
+              if (syncTimeout) clearTimeout(syncTimeout);
+              syncTimeout = setTimeout(() => {
+                syncAssets();
+                // ディレクトリの追加/削除があった場合は監視対象を更新
+                setTimeout(() => setupWatchers(true), 100);
+              }, 500);
+            });
+            dirWatchers.set(srcAssetsDir, watcher);
+          } catch (error) {
+            console.error(`❌ Error watching assets root:`, error.message);
+          }
+        }
+        
+        const watchedDirs = getWatchedDirs();
         watchedDirs.forEach(dir => {
           const dirPath = path.join(srcAssetsDir, dir);
           if (!fs.existsSync(dirPath)) return;
           
-          // ディレクトリ自体を監視
-          fs.watchFile(dirPath, { interval: 1000 }, () => {
-            console.log(`📁 Directory changed: ${dir}`);
-            if (syncTimeout) clearTimeout(syncTimeout);
-            syncTimeout = setTimeout(() => syncAssets(), 500);
-          });
+          // ディレクトリ自体を監視（重複登録を防ぐ）
+          if (!dirWatchers.has(dirPath)) {
+            // fs.watchを使用（より高速で信頼性が高い）
+            try {
+              const watcher = fs.watch(dirPath, { recursive: false }, (eventType, filename) => {
+                console.log(`📁 Directory ${eventType}: ${dir}/${filename || ''}`);
+                if (syncTimeout) clearTimeout(syncTimeout);
+                syncTimeout = setTimeout(() => {
+                  syncAssets();
+                  // ファイル追加/削除があった場合は監視対象を更新
+                  if (eventType === 'rename') {
+                    setTimeout(() => setupWatchers(true), 100);
+                  }
+                }, 500);
+              });
+              dirWatchers.set(dirPath, watcher);
+            } catch (error) {
+              console.error(`❌ Error watching directory ${dir}:`, error.message);
+            }
+          }
           
           // ディレクトリ内のファイルを再帰的に監視
           const watchFilesInDir = (dir) => {
             if (!fs.existsSync(dir)) return;
             
-            fs.readdirSync(dir).forEach(item => {
-              const fullPath = path.join(dir, item);
-              const stat = fs.statSync(fullPath);
-              
-              if (stat.isDirectory()) {
-                watchFilesInDir(fullPath);
-              } else {
-                // 既に監視中でなければ監視を開始
-                if (!watchers.has(fullPath)) {
-                  fs.watchFile(fullPath, { interval: 1000 }, (curr, prev) => {
-                    if (curr.mtime !== prev.mtime) {
-                      console.log(`📝 File changed: ${path.relative(srcAssetsDir, fullPath)}`);
-                      if (syncTimeout) clearTimeout(syncTimeout);
-                      syncTimeout = setTimeout(() => syncAssets(), 500);
+            try {
+              fs.readdirSync(dir).forEach(item => {
+                const fullPath = path.join(dir, item);
+                
+                // ファイルが既に削除されている可能性があるためチェック
+                if (!fs.existsSync(fullPath)) return;
+                
+                const stat = fs.statSync(fullPath);
+                
+                if (stat.isDirectory()) {
+                  // サブディレクトリも監視
+                  if (!dirWatchers.has(fullPath)) {
+                    try {
+                      const watcher = fs.watch(fullPath, { recursive: false }, (eventType, filename) => {
+                        console.log(`📁 Subdirectory ${eventType}: ${path.relative(srcAssetsDir, fullPath)}/${filename || ''}`);
+                        if (syncTimeout) clearTimeout(syncTimeout);
+                        syncTimeout = setTimeout(() => {
+                          syncAssets();
+                          if (eventType === 'rename') {
+                            setTimeout(() => setupWatchers(true), 100);
+                          }
+                        }, 500);
+                      });
+                      dirWatchers.set(fullPath, watcher);
+                    } catch (error) {
+                      console.error(`❌ Error watching subdirectory ${fullPath}:`, error.message);
                     }
-                  });
-                  watchers.set(fullPath, true);
+                  }
+                  watchFilesInDir(fullPath);
+                } else {
+                  // ファイルの監視を開始（重複チェック済み）
+                  if (!watchers.has(fullPath)) {
+                    fs.watchFile(fullPath, { interval: 1000 }, (curr, prev) => {
+                      if (curr.mtime !== prev.mtime) {
+                        console.log(`📝 File changed: ${path.relative(srcAssetsDir, fullPath)}`);
+                        if (syncTimeout) clearTimeout(syncTimeout);
+                        syncTimeout = setTimeout(() => syncAssets(), 500);
+                      }
+                    });
+                    watchers.set(fullPath, true);
+                  }
                 }
-              }
-            });
+              });
+            } catch (error) {
+              console.error(`❌ Error watching files in ${dir}:`, error.message);
+            }
           };
           
           watchFilesInDir(dirPath);
         });
+        
+        if (!isUpdate) {
+          console.log(`✅ Watching ${watchers.size} files and ${dirWatchers.size} directories`);
+        }
       };
       
       // 初回セットアップ
       setupWatchers();
       
-      // 定期的に監視対象を更新（新規ファイルの検出）
-      const watcherInterval = setInterval(() => {
-        setupWatchers();
-      }, 5000);
+      // 定期的な同期のみ（監視の再設定は不要）
+      const syncInterval = setInterval(() => {
+        console.log('🔄 Periodic sync check...');
+        syncAssets();
+      }, 30000); // 30秒ごとに同期チェック
       
       // HTTPエンドポイントも維持
       server.middlewares.use('/__sync-assets', (req, res) => {
@@ -219,16 +345,27 @@ const copyAssetsPlugin = () => {
       
       // サーバー停止時のクリーンアップ
       server.httpServer?.on('close', () => {
-        // すべてのwatcherを停止
+        // すべてのファイル監視を停止
         watchers.forEach((_, file) => {
           fs.unwatchFile(file);
         });
-        clearInterval(watcherInterval);
+        watchers.clear();
+        
+        // すべてのディレクトリ監視を停止（fs.watchはcloseメソッドを使用）
+        dirWatchers.forEach((watcher) => {
+          if (watcher && typeof watcher.close === 'function') {
+            watcher.close();
+          }
+        });
+        dirWatchers.clear();
+        
+        clearInterval(syncInterval);
         if (syncTimeout) clearTimeout(syncTimeout);
       });
       
       console.log('✅ Gulpライクな自動同期が有効になりました');
-      console.log('📁 監視中: fonts, icons, videos, downloads');
+      const initialDirs = getWatchedDirs();
+      console.log(`📁 監視中: ${initialDirs.length > 0 ? initialDirs.join(', ') : 'なし'}`);
       
       // 3秒後に初回同期
       setTimeout(() => {
