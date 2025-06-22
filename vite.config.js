@@ -77,11 +77,26 @@ const copyAssetsPlugin = () => {
       });
     }
     console.log('📁 Assets copied to dist/assets/');
+    
+    // 画像ディレクトリの確認と作成
+    const imagesSrcDir = path.resolve(__dirname, 'development/src/images');
+    const imagesDistDir = path.resolve(__dirname, 'development/themes/mythme/dist/assets/images');
+    
+    if (fs.existsSync(imagesSrcDir) && fs.readdirSync(imagesSrcDir).length > 0) {
+      // 画像ディレクトリが存在しない場合は作成
+      if (!fs.existsSync(imagesDistDir)) {
+        fs.mkdirSync(imagesDistDir, { recursive: true });
+        console.log('📁 Images directory created: dist/assets/images/');
+      }
+    }
   };
 
   // Gulpライクな差分同期
   const syncAssets = () => {
     console.log('🔄 Syncing assets...');
+    
+    // ビルドで生成されるディレクトリ（削除対象から除外）
+    const protectedDirs = ['css', 'js', 'images'];
     
     // src/assets配下のすべてのディレクトリを動的に取得
     const getAssetDirs = () => {
@@ -108,9 +123,9 @@ const copyAssetsPlugin = () => {
     const srcDirs = getAssetDirs();
     const distDirs = getDistDirs();
     
-    // distにのみ存在するディレクトリを削除
+    // distにのみ存在するディレクトリを削除（ただし保護されたディレクトリは除外）
     distDirs.forEach(dir => {
-      if (!srcDirs.includes(dir)) {
+      if (!srcDirs.includes(dir) && !protectedDirs.includes(dir)) {
         const distDir = path.join(distAssetsDir, dir);
         // ディレクトリを再帰的に削除
         fs.rmSync(distDir, { recursive: true, force: true });
@@ -323,14 +338,15 @@ const copyAssetsPlugin = () => {
       
       // 初回セットアップ
       setupWatchers();
+    
+      const initialDirs = getWatchedDirs();
+      console.log(`📁 監視中: ${initialDirs.length > 0 ? initialDirs.join(', ') : 'なし'}`);
       
-      // 定期的な同期のみ（監視の再設定は不要）
-      const syncInterval = setInterval(() => {
-        console.log('🔄 Periodic sync check...');
-        syncAssets();
-      }, 30000); // 30秒ごとに同期チェック
-      
-      // HTTPエンドポイントも維持
+      // 起動時の初回同期（即座に実行）
+      console.log('🧪 Initial sync...');
+      syncAssets();
+
+      // HTTPエンドポイントを維持（手動同期用）
       server.middlewares.use('/__sync-assets', (req, res) => {
         if (req.method === 'POST') {
           console.log('🔄 Manual sync triggered');
@@ -359,72 +375,8 @@ const copyAssetsPlugin = () => {
         });
         dirWatchers.clear();
         
-        clearInterval(syncInterval);
+        // 定期チェックのタイマーがあれば停止
         if (syncTimeout) clearTimeout(syncTimeout);
-      });
-      
-      console.log('✅ Gulpライクな自動同期が有効になりました');
-      const initialDirs = getWatchedDirs();
-      console.log(`📁 監視中: ${initialDirs.length > 0 ? initialDirs.join(', ') : 'なし'}`);
-      
-      // 3秒後に初回同期
-      setTimeout(() => {
-        console.log('🧪 Initial sync...');
-        syncAssets();
-      }, 3000);
-
-      // 既存のchokidar設定は念のため残す（将来的に動作する可能性）
-
-      // ファイル変更監視
-      console.log('👀 Watching assets directory:', srcAssetsDir);
-      
-      // より詳細な監視設定
-      const watcher = chokidar.watch(srcAssetsDir, {
-        ignored: /^\.|node_modules/, // . で始まるファイルとnode_modulesのみ除外
-        persistent: true,
-        ignoreInitial: true,
-        awaitWriteFinish: {
-          stabilityThreshold: 100,
-          pollInterval: 100
-        },
-        usePolling: true, // より確実な監視のためpollingを使用
-        interval: 100
-      });
-      
-      console.log('🔍 Chokidar watch options:', {
-        directory: srcAssetsDir,
-        exists: fs.existsSync(srcAssetsDir),
-        readable: fs.accessSync ? 'checking...' : 'unknown'
-      });
-      
-      try {
-        fs.accessSync(srcAssetsDir, fs.constants.R_OK);
-        console.log('✅ Assets directory is readable');
-      } catch (error) {
-        console.error('❌ Assets directory access error:', error.message);
-      }
-      
-      watcher.on('change', (path) => {
-        console.log('📁 Assets changed:', path, 'copying...');
-        copyAssets();
-      });
-      
-      watcher.on('add', (path) => {
-        console.log('📁 Asset added:', path, 'copying...');
-        copyAssets();
-      });
-      
-      watcher.on('unlink', (path) => {
-        console.log('📁 Asset removed:', path, 'synchronizing...');
-        syncAssets();
-      });
-      
-      watcher.on('error', error => {
-        console.error('❌ Watcher error:', error);
-      });
-      
-      watcher.on('ready', () => {
-        console.log('✅ Asset watcher ready');
       });
     },
     // ビルド時にも実行
@@ -465,7 +417,8 @@ export default defineConfig({
   build: {
     manifest: true,
     outDir: 'development/themes/mythme/dist',
-    emptyOutDir: true,
+    // 開発時は絶対にdistディレクトリをクリアしない（画像やアセットを保持）
+    emptyOutDir: false,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'development/src/js/main.js')

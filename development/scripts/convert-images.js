@@ -84,6 +84,9 @@ function isImageFile(filePath) {
  */
 async function convertToWebP(inputPath, outputPath, options = {}) {
   try {
+    // 出力ディレクトリを確実に作成
+    await ensureDir(path.dirname(outputPath));
+    
     const image = sharp(inputPath);
     
     // サイズ指定がある場合はリサイズ

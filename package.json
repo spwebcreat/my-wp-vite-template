@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "npm run convert-images && npm run dev:watch",
+    "dev": "npm run build && npm run dev:watch",
     "dev:watch": "concurrently \"npm run watch-images\" \"vite\" --names \"📷,⚡\" --prefix-colors \"cyan,green\"",
     "build": "vite build && npm run convert-images",
     "preview": "vite preview",
